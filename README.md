@@ -656,7 +656,45 @@ UNION ALL
 SELECT 'shipping_details', COUNT(*) FROM shipping_details;
 ```
 ### Output 
-![Column count check](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/row%20count%20check%20result.png)
+![Row count check](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/row%20count%20check%20result.png)
+
+
+```sql
+/*
+# Count the total number of columns are in the SQL view
+*/
+
+SELECT table_name, COUNT(column_name) AS column_count
+FROM information_schema.columns
+WHERE table_name IN ('customer_info', 'customer_address', 'orders', 
+                     'shipping_details', 'products', 'categories', 
+                     'departments', 'order_items', 'payments')
+GROUP BY table_name
+ORDER BY table_name;
+```
+### Output
+![Column count check](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/column%20count%20check%20result.png)
+
+
+```sql
+/*
+# Data Type Check
+*/
+
+SELECT 
+    table_name, 
+    column_name, 
+    data_type 
+FROM information_schema.columns
+WHERE table_name IN ('customer_info', 'customer_address', 
+                     'categories', 'departments', 'order_items', 
+                     'orders', 'payments', 'products', 'shipping_details')
+ORDER BY table_name, column_name;
+```
+### Output
+![Data Type Check](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/data%20type%20check%20result%201.png)(https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/data%20type%20check%20result%202.png)(https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/data%20type%20check%20result%203.png)
+
+
 
 
 
