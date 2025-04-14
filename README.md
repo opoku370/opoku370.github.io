@@ -43,7 +43,7 @@ This will help the business identify top-performing products, target high-value 
 
 ## DATA SOURCE
 
--<a href= “             back”>Dataset </a> 
+-<a href= “https://github.com/opoku370/opoku370.github.io/blob/main/assets/datasets/DataCoSupplyChainDataset.csv”>Dataset </a> 
 
 ## STAGES
 
@@ -627,6 +627,37 @@ delete from customer_info
 where customer_id in (12024,9619,4243,7674,1722,1851,11557,9358,3861,5498,5486);
 
 ```
+
+
+## Testing 
+### Data Quality Tests
+
+```sql
+/*
+# Count the total number of records (or rows) are in the SQL view
+*/
+
+SELECT 'customer_info' AS table_name, COUNT(*) AS number_of_rows FROM customer_info
+UNION ALL
+SELECT 'customer_address', COUNT(*) FROM customer_address
+UNION ALL
+SELECT 'categories', COUNT(*) FROM categories
+UNION ALL
+SELECT 'departments', COUNT(*) FROM departments
+UNION ALL
+SELECT 'order_items', COUNT(*) FROM order_items
+UNION ALL
+SELECT 'orders', COUNT(*) FROM orders
+UNION ALL
+SELECT 'payments', COUNT(*) FROM payments
+UNION ALL
+SELECT 'products', COUNT(*) FROM products
+UNION ALL
+SELECT 'shipping_details', COUNT(*) FROM shipping_details;
+```
+### Output 
+![Column count check](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/row%20count%20check%20result.png)
+
 
 
 
