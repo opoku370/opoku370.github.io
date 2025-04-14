@@ -692,7 +692,71 @@ WHERE table_name IN ('customer_info', 'customer_address',
 ORDER BY table_name, column_name;
 ```
 ### Output
-![Data Type Check](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/data%20type%20check%20result%201.png)(https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/data%20type%20check%20result%202.png)(https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/data%20type%20check%20result%203.png)
+![Data Type Check](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/data%20type%20check%20result%201.png)![Data Type Check](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/data%20type%20check%20result%202.png)![Data Type Check](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/data%20type%20check%20result%203.png)
+
+
+```sql
+/*
+# Duplicate Check
+*/
+
+SELECT *, COUNT(*) 
+FROM supply_chain
+GROUP BY days_for_shipping_real, days_for_shipment_scheduled, benefit_per_order, delivery_status,
+         late_delivery_risk, category_name, customer_city, customer_country, customer_fname,
+         customer_id, customer_lname, customer_segment, customer_state, customer_street, 
+         customer_zipcode, department_id, department_name, market, order_city, order_country, 
+         order_date_dateorders, order_id, order_item_discount, order_item_discount_rate, 
+         order_item_id, order_item_profit_ratio, order_item_quantity, sales, order_item_total, 
+         order_region, order_state, order_status, product_card_id, product_category_id, 
+         product_name, product_price, shipping_date_dateorder, shipping_mode
+HAVING COUNT(*) > 1;
+```
+### Output
+![Duplicate check](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/duplicates%20check%20result.png)
+
+
+## Exploratory data Analysis in PostgreSQL
+Outputs for the higher cardinality dimensions are not shown.
+
+### Dimensions explorations
+```sql
+/*
+# 1. Explore all countries the customers come from
+# 2. Explore all categories 'major Divisions'
+# 3. Explore the various departments
+# 4. Various Countries the orders come from
+# 5. Various Shipping Modes
+# 6. Various Delivery Status
+*/
+
+select distinct customer_country from customer_address;
+
+select distinct category_name from categories;
+
+select distinct department_name from departments;
+
+select distinct order_country from orders;
+
+select distinct shipping_mode from shipping_details;
+
+select distinct delivery_status from shipping_details;
+```
+
+### Output
+-- Explore all countries the customers come from
+![All the Customer Countries](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/customer%20countries%20output.png)
+
+-- Explore all categories 'major Divisions'
+![All Categories](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/distinct%20categories%20output%20.png)
+![All Categories](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/distinct%20category%20output%202.png)
+![All Categories](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/distinct%20categories%20output%203.png)
+
+
+
+
+
+
 
 
 
