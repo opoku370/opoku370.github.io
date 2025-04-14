@@ -164,8 +164,9 @@ The general approach in creating this solution from start to finish;
 #  Loading the supply_chain data into the database
 */
 
--- 1. Create table supply_chain
+-- 1. 
 
+ Create table supply_chain
 (days_for_shipping_real integer, 
  days_for_shipment_scheduled integer,	
  benefit_per_order double precision,
@@ -217,7 +218,8 @@ from supply_chain);
 
 -- 2. creating customer_address table
 create table customer_address as 
-(select distinct 
+(select distinct
+customer_id
 customer_country,
 customer_state,
 customer_city,
