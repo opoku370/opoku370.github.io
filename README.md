@@ -316,6 +316,8 @@ department_name
 product_category_id
 from supply_chain);
 
+```
+
 
 
 
