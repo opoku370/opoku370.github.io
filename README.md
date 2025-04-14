@@ -744,10 +744,9 @@ select distinct delivery_status from shipping_details;
 ```
 
 ### Output
--- Explore all countries the customers come from
+
 ![All the Customer Countries](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/customer%20countries%20output.png)
 
--- Explore all categories 'major Divisions'
 ![All Categories](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/distinct%20categories%20output%20.png)
 ![All Categories](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/distinct%20category%20output%202.png)
 ![All Categories](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/distinct%20categories%20output%203.png)
