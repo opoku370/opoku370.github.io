@@ -124,11 +124,13 @@ Some of the data visuals that may be appropriate in answering our questions incl
 ### TOOLS
 
 |  Tool  |            Purpose  |
---------------------------------
+|--------|---------------------|
 |Excel  | Exploring the data|
 |PostgreSQL| Further exploration, Cleaning, Testing , analysing the data|
 |Tableau| Visualizing the data with interactive dashboards|
 |Github| Hosting the project documentation|
+
+
 
 ## DEVELOPMENT
 
