@@ -199,7 +199,8 @@ The data is loaded into PostgreSQL with the name Supply chain. The Supply chain 
 
 ```sql
 /*
-#  Creating sub tables out of the supply chain table
+# Creating sub tables out of the supply chain table
+# Normalizing for atomicity
 */
 
 -- 1. Creating customer_info
@@ -216,6 +217,21 @@ customer_zipcode,
 customer_street
 from supply_chain);
 
+alter table customer_info
+add column customer_streetnumber varchar(100) ; 
+
+alter table customer_info
+add column customer_streetname varchar(100);
+
+update customer_info
+set customer_streetnumber = substring (customer_street from '^[0-9]+'),
+customer_streetname = LTRIM (regexp_replace (customer_street, '^[0-9]+\s*', '' ));
+
+alter table customer_info
+add constraint pk_customer_id primary key (customer_id);
+
+
+
 -- 2. creating customer_address table
 create table customer_address as 
 (select distinct
@@ -231,8 +247,15 @@ from customer_info);
 alter table customer_address
 add column addressid serial;
 
+alter table customer_address
+add constraint pk_addressid primary key (addressid),
+add constraint fk_customer_id foreign key (customer_id) references
+customer_info(customer_id)
+on delete cascade
+on update cascade;
 
---Creating order_items and Payments table 
+
+-- 3. Creating order_items table 
 create table order_items as 
 (select distinct 
 order_item_id, 
@@ -246,6 +269,22 @@ benefit_per_order,
 product_card_id
 from supply_chain);
 
+alter table order_items
+add constraint order_item_id primary key (order_item_id);
+
+alter table order_items
+add constraint fk_order_id foreign key (order_id) references orders(order_id)
+on delete cascade
+on update cascade;
+
+alter table order_items
+add constraint fk_product_card_id foreign key (product_card_id) references products(product_card_id)
+on delete cascade
+on update cascade;
+
+
+-- 4. Creating payments table
+
 create table payments as 
  (select distinct
 order_id,
@@ -258,8 +297,18 @@ from supply_chain);
 alter table payments
 add column payment_id serial;
 
+alter table payments
+add constraint payment_id primary key (payment_id);
 
---- Creating orders and shipping details table
+alter table payments
+add constraint fk_order_id foreign key (order_id) references orders(order_id)
+on delete cascade
+on update cascade;
+
+
+
+-- 5. Creating orders table
+
 create table orders as 
 (select distinct 
 order_id,
@@ -277,6 +326,27 @@ delivery_status,
 late_delivery_risk
 from supply_chain);
 
+SELECT TO_TIMESTAMP('1/1/2015 0:00', 'FMMM/FMDD/YYYY FMHH24:MI');
+
+ALTER TABLE orders 
+ALTER COLUMN order_date_dateorders TYPE TIMESTAMP 
+USING TO_TIMESTAMP(order_date_dateorders, 'FMMM/FMDD/YYYY FMHH24:MI');
+
+ALTER TABLE orders 
+ALTER COLUMN shipping_date_dateorder TYPE TIMESTAMP 
+USING TO_TIMESTAMP(shipping_date_dateorder, 'FMMM/FMDD/YYYY FMHH24:MI');
+
+alter table orders
+add constraint pk_order_id primary key (order_id);
+
+alter table orders
+add constraint fk_customer_id foreign key (customer_id) references customer_info(customer_id)
+on delete cascade
+on update cascade;
+
+
+-- 6. Creating shipping table
+
 create table shipping_details as
 (select distinct
 order_id, 
@@ -289,8 +359,17 @@ from orders);
 alter table shipping_details
 add column shipping_id serial;
 
+alter table shipping_details
+add constraint pk_shipping_id primary key (shipping_id);
 
---Creating a Products table
+alter table shipping_details
+add constraint fk_order_id foreign key (order_id) references orders(order_id)
+on delete cascade
+on update cascade;
+
+
+-- 7. Creating a products table
+
 create table products as 
 (select distinct 
 product_card_id,
@@ -299,7 +378,17 @@ product_category_id,
 product_price
 from supply_chain);
 
---Creating Categories table
+alter table products
+add constraint pk_product_card_id primary key (product_card_id);
+
+alter table products
+add constraint fk_product_category_id foreign key (product_category_id) references categories(product_category_id)
+on delete cascade
+on update cascade;
+
+
+-- 8. Creating categories table
+
 create table categories as 
 (select distinct 
 product_category_id,
@@ -308,7 +397,17 @@ department_id,
 department_name
 from supply_chain);
 
---Creating Departments table
+alter table categories
+add constraint product_category_id primary key (product_category_id);
+
+alter table categories
+add constraint fk_department_id foreign key (department_id) references departments(department_id)
+on delete cascade
+on update cascade;
+
+
+-- 9. Creating departments table
+
 create table departments as 
 (select distinct 
 department_id,
@@ -316,10 +415,218 @@ department_name
 product_category_id
 from supply_chain);
 
+alter table departments
+add constraint pk_department_id primary key (department_id);
+
+
 ```
 
+### Relationship between tables
+
+|Table Name | Primary Key (PK) | Foreign Key (FK) | Relationship|
+|---------------|-------------------------|-----------------------|----------------|
+|Customer Info | customer id| address id | 1:1 customer address|
+|Customer Address| address id| - | 1: 1 with customer Info|
+|Orders| order id | customer id | N: 1 with Customer info |
+|Shipping details | shipping id | order id| 1: 1 with Orders|
+|Order items | order item id | order id, product card id| N :1 with Orders|
+|Products| product card id| product category id| N : 1 Categories|
+|Categories| product category id| department id| N :1 Department|
+|Departments| department id| - | 1 : N with Categories|
+|Payments | payment id | order id | 1: 1 with Orders|
+
+### Data Exploration in PostgreSQL
+
+1.	There were inconsistencies in the customer street, customer zip-code and customer state for the following customer ids; 17171, 14046, 14577.
+2.	The data contains record of 1710 customers with customer_fname as Mary and Customer_lname as Smith having different addresses.
+3.	The customer Mary Smith has two records of data with different customer id, having the same customer_city, customer_country, customer_fname, customer_lname, customer_segment, customer_state, customer_zipcode and customer_street for eleven records. The difference between this eleven records is the customer street address.
+
+### Data Cleaning 
+
+A cleaned data should meet the following criteria and constraints:
+-	Only relevant columns should be retained.
+-	All data types should be appropriate for the contents of each column.
+-	No column should contain null values, indicating complete data for all records.
+-	The data should be without duplicate.
+And to achieve that;
+-	The following columns were removed during the data exploration stage in excel; customer email, customer password, Product status, sales per customers, latitude, longitude, order profit per order, order item product price.
+-	There were null values in the customer lname column which was updated with ‘Unknown’
+-	The customer city for customer id 17171 and 14577 was updated with ‘Elk Grove’ and that of customer id 14046 was updated with ‘El Monte’
+-	The customer zipcode for customer id 17171 and 14577 was updated with 95758 and that of customer id 14046 was updated with 91732.
+-	The customer state for the customer id 17171, 14577 and 14046 was updated as ‘CA’ and their customer Street set as  ‘Unknown’
+-	Suspected customers with different customer ids were updated accordingly.
+
+  ```sql
+/*
+# 1. Checking for inconsistencies and errors
+# 2. duplicates check
+*/
+
+-- 1. 
+update customer_info
+set customer_lname = 'Unknown'
+where customer_lname is null;
+
+update customer_info
+set customer_country ='USA'
+where customer_country = 'EE. UU.';
+
+update customer_info
+set customer_city = 'Elk Grove'
+where customer_id = 17171 and customer_fname = 'Eugenia'
+
+update customer_info 
+set customer_city = 'Elk Grove'
+where customer_id = 14577 and customer_fname = 'Sara'
+
+update customer_info 
+set customer_city = 'El Monte'
+where customer_id = 14046 and customer_fname = 'Zena'
+
+update customer_info
+set customer_zipcode = '95758'
+where customer_id = 17171 and customer_fname = 'Eugenia'
+
+update customer_info
+set customer_zipcode= '95758' 
+where customer_id =14577 and customer_fname ='Sara'
+
+update customer_info
+set customer_zipcode = '91732'
+where customer_id = 14046 and customer_fname = 'Zena'
+
+update customer_info
+set customer_state = 'CA'
+where customer_id = 17171 and customer_fname = 'Eugenia'
+
+update customer_info
+set customer_state= 'CA' 
+where customer_id =14577 and customer_fname ='Sara'
+
+update customer_info
+set customer_state = 'CA'
+where customer_id = 14046 and customer_fname = 'Zena'
+
+update customer_info
+set customer_street = 'Unknown'
+where customer_id = 17171 and customer_fname = 'Eugenia'
+
+update customer_info
+set customer_street= 'Unknown' 
+where customer_id =14577 and customer_fname ='Sara'
+
+update customer_info
+set customer_street = 'Unknown'
+where customer_id = 14046 and customer_fname = 'Zena'
+
+update customer_info
+set customer_streetnumber = 'Unknown'
+where customer_id = 17171 and customer_fname = 'Eugenia';
+
+update customer_info 
+set customer_streetnumber = 'Unknown'
+where customer_id = 14577 and customer_fname = 'Sara';
+
+update customer_info 
+set customer_streetnumber = 'Unknown'
+where customer_id = 14046 and customer_fname = 'Zena';
+
+alter table customer_info
+drop column customer_street,
+drop column customer_city, 
+drop column customer_country,
+drop column customer_state,
+drop column customer_zipcode,
+drop column customer_streetname,
+drop column customer_streetnumber;
+
+UPDATE orders
+SET order_country = CASE 
+    WHEN order_country = 'Egipto' THEN 'Egypt'
+    WHEN order_country = 'Estados Unidos' THEN 'USA'
+    WHEN order_country = 'Afganistán' THEN 'Afghanistan'
+    WHEN order_country = 'Alemania' THEN 'Germany'
+    WHEN order_country = 'Arabia Saudí' THEN 'Saudi Arabia'
+    WHEN order_country = 'Argelia' THEN 'Algeria'
+    WHEN order_country = 'Azerbaiyán' THEN 'Azerbaijan'
+    WHEN order_country = 'Bélgica' THEN 'Belgium'
+    WHEN order_country = 'Baréin' THEN 'Bahrain'
+    WHEN order_country = 'Bangladés' THEN 'Bangladesh'
+    WHEN order_country = 'Belice' THEN 'Belize'
+    WHEN order_country = 'Bielorrusia' THEN 'Belarus'
+	WHEN order_country = 'Bosnia y Herzegovina' THEN 'Bosnia and Herzegovina'
+	WHEN order_country = 'Brasil' THEN 'Brazil'
+	WHEN order_country = 'Bután' Then 'Bhutan'
+	WHEN order_country = 'Botsuana' THEN 'Botswana'
+	WHEN order_country = 'Chipre' THEN 'Cyprus'
+	WHEN order_country = 'Emiratos Árabes Unidos' THEN 'United Arab Emirates'
+	WHEN order_country = 'España' THEN 'Spain'
+	WHEN order_country = 'Gabón'  THEN 'Gabon'
+	WHEN order_country = 'Etiopía' THEN 'Ethiopia'
+	WHEN order_country = 'Japón' THEN 'Japan'
+	WHEN order_country = 'Irán' THEN 'Iran'
+	WHEN order_country = 'Irak' THEN 'Iraq'
+	WHEN order_country = 'Kazajistán' THEN 'Kazakhstan'
+	WHEN order_country = 'República Dominicana' THEN 'Dominican Republic'
+	WHEN order_country = 'Sáhara Occidental' THEN 'Sahara Occidental'
+	ELSE order_country END
+WHERE order_country IN ('Egipto','Estados Unidos','Afganistán', 'Alemania', 'Arabia Saudí', 
+                        'Argelia','Azerbaiyán', 'Bélgica', 'Baréin', 'Bangladés', 'Belice',
+						'Bielorrusia','Bosnia y Herzegovina', 'Brasil', 'Bután', 'Botsuana',
+						'Chipre', 'Emiratos Árabes Unidos','España', 'Gabón','Etiopía','Japón',
+						'Irán', 'Kazajistán', 'República Dominicana', 'Sáhara Occidental' );
 
 
+-- 2. identying duplicate records of same customers with different customer_id
+select distinct 
+customer_city,
+customer_country,
+customer_fname,
+customer_lname,
+customer_segment,
+customer_state,
+customer_zipcode,
+customer_street,
+count (*) as num_record,
+STRING_AGG (customer_id ::TEXT ,',') as customer_ids
+from customer_info 
+group by 
+customer_city,
+customer_country,
+customer_fname,
+customer_lname,
+customer_segment,
+customer_state,
+customer_zipcode,
+customer_street
+having count (*)>1
+order by num_record DESC;
+
+
+-- assigning a single customer_id for customers with double customer id
+UPDATE orders
+SET customer_id = CASE 
+    WHEN customer_id = 12024 THEN 5286
+    WHEN customer_id = 9619 THEN 1495
+    WHEN customer_id = 4243 THEN 3765
+    WHEN customer_id = 7674 THEN 2005
+    WHEN customer_id = 1722 THEN 1493
+    WHEN customer_id = 1851 THEN 344
+    WHEN customer_id = 11557 THEN 11866
+    WHEN customer_id = 9358 THEN 2083
+    WHEN customer_id = 3861 THEN 6840
+    WHEN customer_id = 5498 THEN 1954
+    WHEN customer_id = 5486 THEN 644
+    ELSE customer_id
+END
+WHERE customer_id IN (12024, 9619, 4243, 7674, 1722, 1851, 11557, 9358, 3861, 5498, 5486);
+
+
+-- deleting the duplicate records
+delete from customer_info
+where customer_id in (12024,9619,4243,7674,1722,1851,11557,9358,3861,5498,5486);
+
+```
 
 
 
