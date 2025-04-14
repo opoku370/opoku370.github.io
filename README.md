@@ -655,7 +655,7 @@ SELECT 'products', COUNT(*) FROM products
 UNION ALL
 SELECT 'shipping_details', COUNT(*) FROM shipping_details;
 ```
-### Output 
+#### Output 
 ![Row count check](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/row%20count%20check%20result.png)
 
 
@@ -672,7 +672,7 @@ WHERE table_name IN ('customer_info', 'customer_address', 'orders',
 GROUP BY table_name
 ORDER BY table_name;
 ```
-### Output
+#### Output
 ![Column count check](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/column%20count%20check%20result.png)
 
 
@@ -691,7 +691,7 @@ WHERE table_name IN ('customer_info', 'customer_address',
                      'orders', 'payments', 'products', 'shipping_details')
 ORDER BY table_name, column_name;
 ```
-### Output
+#### Output
 ![Data Type Check](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/data%20type%20check%20result%201.png)![Data Type Check](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/data%20type%20check%20result%202.png)![Data Type Check](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/data%20type%20check%20result%203.png)
 
 
@@ -712,7 +712,7 @@ GROUP BY days_for_shipping_real, days_for_shipment_scheduled, benefit_per_order,
          product_name, product_price, shipping_date_dateorder, shipping_mode
 HAVING COUNT(*) > 1;
 ```
-### Output
+#### Output
 ![Duplicate check](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/duplicates%20check%20result.png)
 
 
@@ -743,13 +743,229 @@ select distinct shipping_mode from shipping_details;
 select distinct delivery_status from shipping_details;
 ```
 
-### Output
+#### Output
+
+-- 1. Distinct Customer Countries
 
 ![All the Customer Countries](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/customer%20countries%20output.png)
+
+ -- 2. Distinct Categories
 
 ![All Categories](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/distinct%20categories%20output%20.png)
 ![All Categories](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/distinct%20category%20output%202.png)
 ![All Categories](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/distinct%20categories%20output%203.png)
+
+-- 3. Distinct Departments
+
+![All Departments](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/distinct%20department%20output.png)
+
+-- 4. Distinct Order Country is of higher cardinality dimensions.
+
+
+-- 5. Distinct Shipping Modes
+
+![All the Shipping Modes](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/distinct%20shipping%20mode%20output.png)
+
+
+-- 6. Distinct Delivery Status
+
+![All the Delivery status](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/distinct%20delivery%20status%20output.png)
+
+
+### Date Exploration
+```sql
+/*
+# Date Exploration for the number of years of sales available with the first and last order
+*/
+
+SELECT 
+    MIN(order_date) AS first_order_date,
+    MAX(order_date) AS last_order_date,
+    EXTRACT(YEAR FROM AGE(MAX(order_date), MIN(order_date))) AS order_range_years
+FROM orders;
+```
+
+#### Output
+![Number of Years of Sales](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/Date%20Exploration%20output.png)
+
+
+### Measures Exploration (KPI)
+```sql
+/*
+# 1. Total Sales
+# 2. Total Profit
+# 3. Total number of Items sold
+# 4. Average Selling Price
+# 5. Total number of Orders
+# 6. Total Number of orders from different Customers
+# 7. Total Number of Products
+# 8. Total Number of Customers to place order
+# 9. Total number of countries the orders came from
+*/
+ 
+SELECT sum (sales) as total_sales from payments;
+
+SELECT sum (benefit_per_order) as total_profit from order_items;
+
+SELECT sum (order_item_quantity) as total_quantity from order_items;
+
+SELECT avg(product_price) as avg_price from products;
+
+SELECT count (order_id) as total_orders from order_items;
+
+SELECT count (distinct order_id) as total_orders from order_items;
+
+SELECT count (product_card_id) as total_products from products;
+
+SELECT count (customer_id) as total_customers from customer_info;
+
+SELECT count (distinct order_country) from orders;
+
+select 'Total Sales' as measure_name, sum (sales) as measure_value from payments
+Union All
+select 'Total Profit' as measure_name, sum (benefit_per_order) as measure_value from order_items
+Union All
+select 'Total Quantity' as measure_name, sum (order_item_quantity) as measure_value from 
+order_items
+Union All
+select 'Average_Price' as measure_name, avg(product_price) as measure_value from products
+Union all
+select 'Total Nr. Orders' as measure_name, count (order_id) as measure_value from order_items
+Union All
+select 'Total Nr. Products' as measure_name, count (product_card_id) as measure_value from
+products
+Union All
+select 'Total Nr. Customers' as measure_name, count (customer_id) as measure_value from 
+customer_info
+Union All
+select 'Total Nr. Order Countries' as measure_name, count (distinct order_country) from orders; 
+```
+
+#### Output
+![Measures Exploration](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/KPI%20output.png)
+
+
+### Magnitude Analysis
+```sql
+/*
+# 1. Total Customers by Countries
+# 2. Total Products by Categories
+# 3. Average Cost in Each Category
+# 4. Total Revenue generated for each Category
+# 5. Distribution of Sold Items across Countries (High cardinality dimension)
+# 6. On-Time vs. Late Deliveries by Region
+# 7. Sales by Market and Customer Segment
+
+*/
+-- 1. Total Customers by Countries
+
+select customer_country, count(c.customer_id) as total_customers
+from customer_info c
+join customer_address ca on c.addressid = ca.addressid
+group by customer_country
+order by count(customer_id) DESC
+
+-- 2. Total Products by Categories
+Select c.category_name, count (p.product_card_id) 
+from products p 
+join categories c on c.product_category_id = p.product_category_id
+group by category_name
+order by 2 desc
+
+-- 3. Average Cost in Each Category
+select c.category_name, avg(product_price) as Average_price
+from categories c
+join products p on c.product_category_id = p.product_category_id
+group by c.category_name
+order by 2 DESC
+
+-- 4. Total Revenue generated for each Category
+select c.category_name, sum (sales) as Total_Revenue
+from categories c
+Join products pr on c.product_category_id = pr.product_category_id
+Join order_items oi on pr.product_card_id = oi.product_card_id
+join payments p on oi.order_id = p.order_id
+group by category_name
+order by 2 DESC;
+
+-- 5. Distribution of Sold Items across Countries (High cardinality dimension)
+ select o.order_country, sum (order_item_quantity)as Items_Sold
+from orders o
+join order_items oi on o.order_id = oi.order_id
+group by 1
+order by 2 DESC
+
+-- 6. On-Time vs. Late Deliveries by Region
+SELECT 
+    o.order_region, 
+    COUNT(CASE WHEN s.late_delivery_risk = 1 THEN o.order_id END) AS late_deliveries, 
+    COUNT(CASE WHEN s.late_delivery_risk = 0 THEN o.order_id END) AS on_time_deliveries, 
+    COUNT(o.order_id) AS total_orders, 
+    ROUND(AVG(s.days_for_shipping_real - s.days_for_shipment_scheduled), 2) AS avg_days_late 
+FROM orders o 
+JOIN shipping_details s ON o.order_id = s.order_id
+GROUP BY o.order_region  
+ORDER BY late_deliveries DESC;
+
+-- 7. Sales by Market and Customer Segment
+SELECT 
+    o.market, 
+    c.customer_segment, 
+    COUNT(o.order_id) AS total_orders, 
+    SUM(oi.order_item_total) AS total_revenue 
+FROM customer_info c  
+JOIN orders o ON o.customer_id = c.customer_id 
+JOIN order_items oi ON o.order_id = oi.order_id
+GROUP BY o.market, c.customer_segment  
+ORDER BY total_revenue DESC;
+```
+#### Output
+
+-- 1. Total Customers by Countries
+
+![Total Customers by Countries](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/magnitude%20total%20customers.png)
+
+-- 2. Total Products by Categories
+
+![Total Products by Categories](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/magnitude%20category%20count%201.png)
+![Total Products by Categories](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/magnitude%20category%20count%202.png)
+![Total Products by Categories](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/magnitude%20category%20count%203.png)
+
+
+-- 3. Average Cost in Each Category
+
+![Average Cost in Each Category](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/avg%20price%20category%201.png)
+![Average Cost in Each Category](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/avg%20price%20category%202.png)
+![Average Cost in Each Category](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/avg%20price%20category%203.png)
+
+
+-- 4. Total Revenue generated for each Category
+
+![Total Revenue generated for each Category](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/total%20revenue%20category%201.png)
+![Total Revenue generated for each Category](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/total%20revenue%20category%202.png)
+![Total Revenue generated for each Category](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/total%20revenue%20category%203.png)
+
+
+-- 5. Distribution of Sold Items across Countries (High cardinality dimension)
+
+
+-- 6. On-Time vs. Late Deliveries by Region
+
+![On-Time vs. Late Deliveries by Region](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/magnitude%20late%20delivery%20output%201.png)
+![On-Time vs. Late Deliveries by Region](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/magnitude%20late%20delivery%20output%202.png)
+
+-- 7. Sales by Market and Customer Segment
+
+![Sales by Market and Customer Segment](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/total%20revenue%20market%2C%20segment%20.png)
+
+
+
+
+
+
+
+
+
 
 
 
