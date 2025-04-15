@@ -658,7 +658,7 @@ UNION ALL
 SELECT 'shipping_details', COUNT(*) FROM shipping_details;
 ```
 #### Output 
-![Row count check](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/row%20count%20check%20result.png)
+![Row count check](assets/images/row count check result.png)
 
 
 Column Count Check
