@@ -454,7 +454,7 @@ And to achieve that;
 -	The customer city for customer id 17171 and 14577 was updated with ‘Elk Grove’ and that of customer id 14046 was updated with ‘El Monte’
 -	The customer zipcode for customer id 17171 and 14577 was updated with 95758 and that of customer id 14046 was updated with 91732.
 -	The customer state for the customer id 17171, 14577 and 14046 was updated as ‘CA’ and their customer Street set as  ‘Unknown’
--	Suspected customers with different customer ids were updated accordingly.
+-	Suspected customers with different customer ids were updated and deleted accordingly.
 
   ```sql
 /*
@@ -1105,43 +1105,43 @@ Exploratory Analysis using PostgreSQL
 
 This exploratory analysis provides insights into customer orders, product categories, shipping performance, and revenue distribution over a three-year period (2015–2018). Below are the key findings:
 
-1. Customer Insights
+-- 1. Customer Insights
    
  - Orders were made by 20,641 customers from 164 different countries.
  - 12,719 customers were from the USA, and 7,922 customers were from Puerto Rico.
  - Despite a global presence, the customers are either Puerto Ricans or American.
 
-2. Product Categories & Departments
+-- 2. Product Categories & Departments
    
  - The dataset includes 50 product categories under 11 departments.
  - Electronics had the highest number of products (11), while most categories contained only one product.
  - Computers had the highest average price of $1,500, while CDs had the lowest at $11.
  - Cleats generated the most revenue ($17,457,667), while CDs generated the least $3059.
 
-3. Sales & Profit Performance
+-- 3. Sales & Profit Performance
  
  - A total of 180,519 distinct orders were placed, selling 384,079 products.
  - Total sales revenue amounted to $36,784,735, with a total profit of $3,966,902.
  - The average product price was $166.
 
-4. Shipping & Delivery Performance
+-- 4. Shipping & Delivery Performance
  
  - There were four shipping modes and four delivery status categories.
  - Late deliveries were the highest among all delivery statuses.
  - Central Africa had the fewest orders and worst delivery performance.
  - Western Europe had the highest total orders, but 55% of them were late deliveries.
 
-5. Regional Revenue Insights
+-- 5. Regional Revenue Insights
  
  - Europe generated the highest revenue ($5,097,709) from customers purchasing for personal use.
  - Africa, where most customers were small businesses, freelancers, or remote workers, generated the least revenue.
 
-6. Customer Spending and Profit Patterns
+-- 6. Customer Spending and Profit Patterns
  
  - Among the top 10 customers, Mary Smith (Customer ID: 2083) from Caguas spent the most, followed by another Mary Smith (Customer ID: 791) from Canton.
  - Among the top 10 customers, Betty Spears (Customer ID: 2641), from Carrollton generated the company the most profit, followed by Mary Smith (Customer ID: 2083) from Caguas.
 
-7. Best & Worst Performing Products
+-- 7. Best & Worst Performing Products
 
     Best-selling product:
  - Perfect Fitness Perfect Rip Deck sold 73,698 units, generating $3,973,180 in revenue.
