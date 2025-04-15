@@ -632,6 +632,8 @@ where customer_id in (12024,9619,4243,7674,1722,1851,11557,9358,3861,5498,5486);
 ## Testing 
 ### Data Quality Tests
 
+Row Count Check
+
 ```sql
 /*
 # Count the total number of records (or rows) are in the SQL view
@@ -659,6 +661,8 @@ SELECT 'shipping_details', COUNT(*) FROM shipping_details;
 ![Row count check](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/row%20count%20check%20result.png)
 
 
+Column Count Check
+
 ```sql
 /*
 # Count the total number of columns are in the SQL view
@@ -675,6 +679,8 @@ ORDER BY table_name;
 #### Output
 ![Column count check](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/column%20count%20check%20result.png)
 
+
+Data Type Check
 
 ```sql
 /*
@@ -694,6 +700,8 @@ ORDER BY table_name, column_name;
 #### Output
 ![Data Type Check](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/data%20type%20check%20result%201.png)![Data Type Check](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/data%20type%20check%20result%202.png)![Data Type Check](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/data%20type%20check%20result%203.png)
 
+
+Duplicate Check
 
 ```sql
 /*
