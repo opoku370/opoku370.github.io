@@ -1150,8 +1150,8 @@ This exploratory analysis provides insights into customer orders, product catego
  - Among the top 10 customers, Betty Spears (Customer ID: 2641), from Carrollton generated the company the most profit, followed by Mary Smith (Customer ID: 2083) from Caguas.
 
 -- 7. Best & Worst Performing Products
-
-    Best-selling product:
+	
+  Best-selling product:
  - Perfect Fitness Perfect Rip Deck sold 73,698 units, generating $3,973,180 in revenue.
  
   Worst-selling product:
