@@ -43,7 +43,7 @@ This will help the business identify top-performing products, target high-value 
 
 ## DATA SOURCE
 
--<a href= “https://github.com/opoku370/opoku370.github.io/blob/main/assets/datasets/DataCoSupplyChainDataset.csv”>Dataset </a> 
+-<a href= “https://github.com/opoku370/opoku370.github.io/blob/main/assets/datasets/DataCoSupplyChainDataset.csv”> Dataset </a> 
 
 ## STAGES
 
@@ -954,19 +954,473 @@ ORDER BY total_revenue DESC;
 ![On-Time vs. Late Deliveries by Region](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/magnitude%20late%20delivery%20output%201.png)
 ![On-Time vs. Late Deliveries by Region](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/magnitude%20late%20delivery%20output%202.png)
 
+
 -- 7. Sales by Market and Customer Segment
 
 ![Sales by Market and Customer Segment](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/total%20revenue%20market%2C%20segment%20.png)
 
 
 
+### Ranking Analysis
+```sql
+/*
+# 1. Total Customers by Total Sales
+# 2. Top Customers by Total Profit
+# 3. Best Selling Products by Quantity Sold
+# 4. Worse Selling Products by Quantity Sold
+# 5. Most Profitable Products
+# 6. Less Profitable Products
+
+*/
+
+-- 1. Top Customers by Total Sales
+SELECT 
+    c.customer_id, 
+    CONCAT(c.customer_fname, ' ', c.customer_lname) AS customer_name, 
+    c.customer_segment, 
+    ca.customer_city, 
+    ca.customer_state, 
+    ca.customer_country, 
+    SUM(p.sales) AS total_spent, 
+    COUNT(distinct o.order_id) AS total_orders 
+FROM customer_address ca 
+JOIN customer_info c ON ca.addressid = c.addressid  
+JOIN orders o ON o.customer_id = c.customer_id
+JOIN payments p ON o.order_id= p.order_id
+GROUP BY c.customer_id, customer_name, c.customer_segment, 
+ca.customer_city,ca.customer_state, ca.customer_country  
+ORDER BY total_spent DESC  
+LIMIT 10;
+
+-- 2. Top Customers by Total Profit
+SELECT 
+    c.customer_id, 
+    CONCAT(c.customer_fname, ' ', c.customer_lname) AS customer_name, 
+    c.customer_segment, 
+    ca.customer_city, 
+    ca.customer_state, 
+    ca.customer_country, 
+    SUM(p.benefit_per_order) AS total_profit, 
+    COUNT(distinct o.order_id) AS total_orders 
+FROM customer_address ca 
+JOIN customer_info c ON ca.addressid = c.addressid  
+JOIN orders o ON o.customer_id = c.customer_id
+JOIN payments p ON o.order_id= p.order_id
+GROUP BY c.customer_id, customer_name, c.customer_segment, 
+ca.customer_city,ca.customer_state, ca.customer_country  
+ORDER BY total_profit DESC  
+LIMIT 10;
+
+
+-- 3. Best Selling Products by Quantity Sold
+SELECT 
+    p.product_name, 
+    c.category_name, 
+    SUM(oi.order_item_quantity) AS total_quantity_sold, 
+    SUM(oi.order_item_total) AS total_revenue, 
+    AVG(oi.order_item_discount_rate) AS avg_discount_rate 
+FROM products p  
+JOIN order_items oi ON p.product_card_id = oi.product_card_id
+JOIN categories c ON p.product_category_id = c.product_category_id 
+GROUP BY p.product_name, c.category_name  
+ORDER BY total_quantity_sold DESC  
+LIMIT 10;
+
+-- 4. Worse Selling Products by Quantity Sold
+SELECT 
+    p.product_name, 
+    c.category_name, 
+    SUM(oi.order_item_quantity) AS total_quantity_sold, 
+    SUM(oi.order_item_total) AS total_revenue, 
+    AVG(oi.order_item_discount_rate) AS avg_discount_rate 
+FROM products p  
+JOIN order_items oi ON p.product_card_id = oi.product_card_id
+JOIN categories c ON p.product_category_id = c.product_category_id 
+GROUP BY p.product_name, c.category_name  
+ORDER BY total_quantity_sold  
+LIMIT 10;
+
+-- 5. Most Profitable Products
+SELECT 
+    p.product_name, 
+    SUM(oi.benefit_per_order) AS total_profit, 
+    SUM(oi.order_item_total) AS total_revenue, 
+   ROUND((SUM(oi.benefit_per_order) / SUM(oi.order_item_total))::NUMERIC, 2)
+FROM order_items oi  
+JOIN products p ON oi.product_card_id = p.product_card_id  
+GROUP BY p.product_name  
+ORDER BY total_profit DESC  
+LIMIT 10;
+
+-- 6. Less Profitable Products 
+SELECT 
+    p.product_name, 
+    SUM(oi.benefit_per_order) AS total_profit, 
+    SUM(oi.order_item_total) AS total_revenue, 
+   ROUND((SUM(oi.benefit_per_order) / SUM(oi.order_item_total))::NUMERIC, 2)
+FROM order_items oi  
+JOIN products p ON oi.product_card_id = p.product_card_id  
+GROUP BY p.product_name  
+ORDER BY total_profit  
+LIMIT 10;
+```
+
+#### Output
+
+-- 1. Top Customers by Total Sales
+
+![Top Customers by Total Sales](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/ranking%20total%20spent%20by%20customers%20output.png)
+
+
+-- 2. Top Customers by Total Profit
+![Top Customers by Total Profit](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/ranking%20total%20profit%20by%20top%2010%20customers.png)
+
+
+-- 3. Best Selling Products by Quantity Sold
+![Best Selling Products by Quantity Sold](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/ranking%20best%20selling%20products.png)
+
+
+-- 4. Worse Selling Products by Quantity Sold
+![Worse Selling Products by Quantity Sold](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/ranking%20worse%20selling%20products.png)
+
+
+-- 5. Most Profitable Products
+![Most Profitable Products](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/ranking%20profitable%20product.png)
+
+-- 6. Less Profitable Products 
+![Less Profitable Products](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/Ranking%20less%20profitable%20products.png)
 
 
 
+## Visualization
+
+![Supply Chain Dashboard](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/Supply%20Chain%20Dashboard.gif)
+
+
+## Analysis
+
+### Findings
+
+Exploratory Analysis using PostgreSQL
+
+This exploratory analysis provides insights into customer orders, product categories, shipping performance, and revenue distribution over a three-year period (2015–2018). Below are the key findings:
+
+1. Customer Insights
+   
+ - Orders were made by 20,641 customers from 164 different countries.
+ - 12,719 customers were from the USA, and 7,922 customers were from Puerto Rico.
+ - Despite a global presence, the customers are either Puerto Ricans or American.
+
+2. Product Categories & Departments
+   
+ - The dataset includes 50 product categories under 11 departments.
+ - Electronics had the highest number of products (11), while most categories contained only one product.
+ - Computers had the highest average price of $1,500, while CDs had the lowest at $11.
+ - Cleats generated the most revenue ($17,457,667), while CDs generated the least $3059.
+
+3. Sales & Profit Performance
+ 
+ - A total of 180,519 distinct orders were placed, selling 384,079 products.
+ - Total sales revenue amounted to $36,784,735, with a total profit of $3,966,902.
+ - The average product price was $166.
+
+4. Shipping & Delivery Performance
+ 
+ - There were four shipping modes and four delivery status categories.
+ - Late deliveries were the highest among all delivery statuses.
+ - Central Africa had the fewest orders and worst delivery performance.
+ - Western Europe had the highest total orders, but 55% of them were late deliveries.
+
+5. Regional Revenue Insights
+ 
+ - Europe generated the highest revenue ($5,097,709) from customers purchasing for personal use.
+ - Africa, where most customers were small businesses, freelancers, or remote workers, generated the least revenue.
+
+6. Customer Spending and Profit Patterns
+ 
+ - Among the top 10 customers, Mary Smith (Customer ID: 2083) from Caguas spent the most, followed by another Mary Smith (Customer ID: 791) from Canton.
+ - Among the top 10 customers, Betty Spears (Customer ID: 2641), from Carrollton generated the company the most profit, followed by Mary Smith (Customer ID: 2083) from Caguas.
+
+7. Best & Worst Performing Products
+
+    Best-selling product:
+ - Perfect Fitness Perfect Rip Deck sold 73,698 units, generating $3,973,180 in revenue.
+ 
+  Worst-selling product:
+ - Bowflex SelectTech 1090 Dumbbells, with only 10 units sold.
+ 
+  Most profitable product:
+ - Field and Stream Sportsman 16 Gun Fire Safe made a profit of $756,220.67.
+
+  Least profitable product:
+ - SOLE E35 Elliptical made a loss of $965.12.
+
+Findings from the Dashboard
+
+The Year 2018 is left out for the dashboard because of the year to year comparison because 2018 has records for only January and not enough record to make comparison for that year. Some categories of products were ruled out for the analysis because they were recently introduced and lacks year by year records to make analysis. These categories are; As Seen on TV! , Baby, Basketball, Books, Cameras, CDs, Children clothing, computers, Consumer electronics, Crafts, DVDs, Golf Bags and Carts, Health and Beauty, Kids Golf clubs, Men’s Clothing, Men’s Golf Clubs, Music, Pet Supplies, Soccer, Sporting Goods, Strength training, Toys, Video Games, Women Clothing, Women’s Golf Club. 
+
+ 
+ Sales Dashboard
+
+
+2017 Analysis:
+
+ - Total Sales: $11.8M (4.03% decrease from 2016)
+ - Highest sales: September ($1.14M)
+ - Lowest sales: December ($0.50M)
+ - Total Profit: $1.30M (0.46% decrease from 2016)
+ - Highest profit: August ($132K)
+ - Lowest profit: December ($66K)
+ - Total Quantity Sold: 106K units (22.74% decrease from 2016)
+ - Highest quantity: March (11.7K units)
+ - Lowest quantity: November (2.1K units)
+
+  
+  Category Performance:
+  
+ - Sales declined for most product categories.
+ - Cleats had the highest profit in 2017.
+
+ 
+  Sales & Profit Trends:
+  
+ - Weekly sales were mostly above the $233K average.
+ - Weekly profits were mostly above the $25K average.
+
+
+2016 Analysis:
+
+ - Total Sales: $12.3M (0.30% decrease from 2015)
+ - Highest sales: August ($1.05M)
+ - Lowest sales: February ($0.97M)
+ - Total Profit: $1.31M (0.66% decrease from 2015)
+ - Highest profit: September ($123K)
+ - Lowest profit: February ($87K)
+ - Total Quantity Sold: 137K units (0.81% decrease from 2015)
+ - Highest quantity: October (11.9K units)
+ - Lowest quantity: February (10.8K units)
+
+  
+   Category Performance:
+   
+ - 14 out of 24 categories saw a decline in sales.
+ - Cleats was the most profitable category and none of the categories had a loss. 
+
+   
+   Sales & Profit Trends:
+   
+ - Weekly sales were mostly above the $232K average.
+ - Weekly profits were mostly above the $25K average.
+
+
+2015 Analysis:
+
+ - Total Sales: $13.2M
+ - Highest Profit Month: August ($118K)
+ - Lowest Profit Month: February ($99K)
+ - Total Quantity Sold: 138K units
+ - Highest quantity: March (12.1K units)
+ - Lowest quantity: February (10.4K units)
+
+  
+   Category Performance:
+   
+ - Cleats was the most profitable category and none of the categories had a loss.
+
+  
+   Sales & Profit Trends:
+   
+ - Weekly sales were mostly above the $233K average.
+ - Weekly profits were mostly above the $25K average.
+
+ 
+Customer Dashboard
+
+Customer Analysis (2015-2017)
+
+
+2017 Analysis
+
+  
+   Total Customers: 15.7K (48.3% increase from 2016)
+ 
+ - Highest in December: 2.1K
+ - Lowest in February: 1.5K
+
+  
+   Sales Per Customer: $779 (35.3% decrease from 2016)
+ 
+ - Highest in September: $706
+ - Lowest in December: $237
+   
+
+
+   Total Orders: 22K (4.8% increase from 2016)
+   
+ - Highest in December: 2.12K
+ - Lowest in February: 1.61K
+   
+
+    Customer Distribution by Number of Orders:
+   
+ - 10,714 customers placed only one order
+ - 2,787 customers placed two orders
+ - 1,159 customers placed three orders
+ - A few customers placed four or more orders, with only two customers ordering seven or eight times.
+
+   Top Customer by Profit:
+   
+ - Mary Spencer contributed the highest profit of $1,252 from seven orders.
 
 
 
+2016 Analysis
 
+
+   Total Customers: 10.2K (0.9% increase from 2015)
+   
+ - Highest in October: 1.7K
+ - Lowest in February: 1.5K
+
+   
+   Sales Per Customer: $1,205 (1.1% decrease from 2015)
+   
+ - Highest in November: $654
+ - Lowest in May: $619
+  
+
+    Total Orders: 21K (0.2% decrease from 2015)
+   
+ - Highest in October: 1.78K
+ - Lowest in February: 1.65K
+  
+
+    Customer Distribution by Number of Orders:
+   
+ - 4,024 customers placed only one order
+ - 3,299 customers placed two orders
+ - 1,772 customers placed three orders, and so on.
+
+  
+ Top Customer by Profit:
+ 
+ - Mary Lewis generated the highest profit of $1,298 from four orders.
+
+
+2015 Analysis
+
+
+   Total Customers: 10.1K
+   
+ - Highest in December: 1.7K
+ - Lowest in February: 1.5K
+
+   
+   Sales Per Customer: $1,219
+   
+ - Highest in October: $642
+ - Lowest in February: $618
+
+  
+   Total Orders: 21K
+   
+ - Highest in December: 1.81K
+ - Lowest in February: 1.59K
+
+
+### Discovery
+
+
+SQL
+
+
+-	The USA and Puerto Rico dominate customer purchases, with 12,719 customers from the USA and 7,922 from Puerto Rico, despite a global presence.
+-	Cleats generated the highest revenue ($17,457,667), while CDs had the lowest revenue ($3,059).
+-	The top-selling product was the Perfect Fitness Perfect Rip Deck, selling 73,698 units and generating $3,973,180 in revenue.
+-	The least-selling product was Bowflex SelectTech 1090 Dumbbells, with only 10 units sold.
+-	Late deliveries were the most common issue, with Western Europe experiencing 55% late deliveries despite having the highest total orders.
+-	Central Africa had the worst delivery performance, with the fewest orders and high late delivery rates.
+-	Europe generated the highest revenue ($5,097,709), primarily from personal-use customers, while Africa generated the lowest revenue, where customers 
+        were mostly small businesses and freelancers.
+-	Mary Smith (Customer ID: 2083) was the highest-spending customer, followed by another Mary Smith (Customer ID: 791).
+-	Betty Spears (Customer ID: 2641) was the most profitable customer, followed by Mary Smith (Customer ID: 2083).
+-	The most profitable product was Field and Stream Sportsman 16 Gun Fire Safe, with a profit of $756,220.67.
+-	The least profitable product was SOLE E35 Elliptical, with a loss of $965.12.
+
+
+Sales Dashboard
+
+
+-	Total sales have been declining over the years, with a 4.03% drop in 2017, a 0.30% drop in 2016, and a total decrease from 2015 to 2017.
+-	2017 had the lowest sales performance, with $11.8M in total sales, a $500K drop in December, and a 22.74% decrease in total quantity sold compared to 2016.
+-	September 2017 had the highest sales ($1.14M), while December had the lowest ($0.50M), showing seasonal fluctuations.
+-	Profit has also seen a downward trend, with a 0.46% decrease in 2017 and 0.66% in 2016, reflecting a gradual decline in overall business profitability.
+-	Cleats remained the most profitable category across all three years, despite 14 out of 24 product categories seeing a decline in 2016.
+-	Weekly sales and profits were generally stable, consistently staying above $233K and $25K on average, suggesting a steady revenue stream despite overall 
+         annual declines.
+-	2015 had the highest overall sales ($13.2M) and total quantity sold (138K units), making it the strongest year in the dataset.
+-	The lowest-performing month across the years was February, showing a recurring seasonal dip in sales and profits.
+-	Despite sales declines, the company maintained profitability, indicating potential opportunities for category optimization and seasonal marketing strategies to boost sales performance. 
+
+
+Customers Dashboard
+
+-	The number of customers grew significantly in 2017, with a 48.3% increase from 2016, reaching 15.7K customers.
+-	Despite customer growth, sales per customer declined, dropping 35.3% in 2017 to $779, compared to $1,205 in 2016 and $1,219 in 2015.
+-	Total orders increased slightly in 2017 (22K orders, up 4.8% from 2016), but the growth was not proportional to the customer increase, indicating more customers making fewer purchases.
+-	The majority of customers placed only one order per year, with 10,714 customers in 2017 making a single purchase, highlighting low customer retention and repeat purchases.
+-	Mary Spencer was the most profitable customer in 2017, generating $1,252 in profit from seven orders, while Mary Lewis led in 2016 with $1,298 from four orders.
+-	December had the highest customer count in both 2017 and 2015, while February consistently had the lowest customer activity across all three years.
+-	Sales per customer steadily declined from 2015 to 2017, indicating either lower spending per purchase or more budget-conscious customers.
+-	Customer engagement dropped, as fewer customers placed multiple orders over time. In 2015 and 2016, more customers placed two or more orders, while in 2017, most only placed one order.
+-	Customer growth did not translate into higher profits, suggesting an opportunity to improve customer retention strategies and increase average order value through targeted marketing and loyalty programs. 
+
+
+## Recommendations
+
+Customer Retention & Engagement
+
+Implement a Loyalty Program – Encourage repeat purchases by offering discounts, rewards, or exclusive deals for returning customers.
+Personalized Marketing – Use customer purchase history to send targeted promotions and recommendations.
+Follow-up Campaigns – Send follow-up emails or special offers to one-time customers to boost retention.
+
+
+Sales & Revenue Growth
+
+Upselling & Cross-Selling – Suggest complementary products at checkout to increase order value.
+ Bundle Deals & Discounts – Create product bundles or limited-time discounts to boost sales per customer.
+ Improve Seasonal Marketing – Since February consistently had the lowest sales, run promotions or campaigns during slow months.
+
+
+Category Optimization
+
+ Expand Profitable Product Categories – Cleats consistently generate high revenue; consider expanding this category.
+ Phase Out Low-Performing Products – Review underperforming products like Bowflex SelectTech 1090 Dumbbells and CDs to optimize inventory.
+
+
+Shipping & Delivery Improvements
+
+ Address Late Deliveries – Western Europe had the highest late delivery rate (55%). Improve logistics and work with better shipping partners.
+ Improve Delivery to Underperforming Regions – Central Africa had the worst delivery performance; reassess shipping routes and options.
+
+
+Customer Segmentation & Targeting
+
+ Focus on High-Value Customers – Customers like Mary Spencer and Mary Lewis contributed the highest profits; identify similar customers for targeted retention.
+ Region-Specific Promotions – Europe generated the highest revenue from personal-use customers, while Africa had more small businesses and freelancers. Adjust marketing strategies accordingly.
+
+
+Business Strategy for Long-Term Growth
+
+Analyze the Decline in Sales Per Customer – Since sales per customer have dropped from $1,219 in 2015 to $779 in 2017, investigate potential reasons (e.g., pricing, competition, economic factors).
+Encourage Higher Order Frequency – Since most customers placed only one order per year, introduce subscription models or recurring purchase incentives.
+Invest in Product Quality & Customer Experience – Enhance product descriptions, customer reviews, and post-purchase engagement to build trust and long-term loyalty.
+
+
+## Conclusions
+
+This project provides valuable insights into customer behavior, sales performance, and operational efficiency through data analysis and visualization. By leveraging SQL, Excel, and Tableau, I explored key trends in customer retention, product performance, shipping efficiency, and regional revenue distribution.
+The findings highlight areas for improvement, including enhancing customer engagement, optimizing product categories, addressing shipping delays, and refining marketing strategies to drive revenue growth. Implementing data-driven recommendations such as loyalty programs, personalized promotions, and inventory adjustments will help increase profitability and customer satisfaction.
 
 
 
