@@ -43,7 +43,8 @@ This will help the business identify top-performing products, target high-value 
 
 ## DATA SOURCE
 
--<a href= “https://github.com/opoku370/opoku370.github.io/blob/main/assets/datasets/DataCoSupplyChainDataset.csv”> Dataset </a> 
+The data is sourced from Kaggle (an Excel extract), [see here to find it.](https://data.mendeley.com/datasets/8gx2fvg2k6/5)
+
 
 ## STAGES
 
