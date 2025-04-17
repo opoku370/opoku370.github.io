@@ -658,7 +658,7 @@ UNION ALL
 SELECT 'shipping_details', COUNT(*) FROM shipping_details;
 ```
 #### Output 
-![Row count check](assets/images/row count check result.png)
+![Row count check](assets/images/row%20count%20check%20result.png)
 
 
 Column Count Check
@@ -677,7 +677,7 @@ GROUP BY table_name
 ORDER BY table_name;
 ```
 #### Output
-![Column count check](assets/images/column count check result.png)
+![Column count check](assets/images/column%20count%20check%20result.png)
 
 
 Data Type Check
@@ -698,7 +698,7 @@ WHERE table_name IN ('customer_info', 'customer_address',
 ORDER BY table_name, column_name;
 ```
 #### Output
-![Data Type Check](assets/images/data type check result 1.png)![Data Type Check](assets/images/data type check result 2.png)![Data Type Check](assets/images/data type check result 3.png)
+![Data Type Check](assets/images/data%20type%20check%20result%201.png)![Data Type Check](assets/images/data%20type%20check%20result%202.png)![Data Type Check](assets/images/data%20type%20check%20result%203.png)
 
 
 Duplicate Check
@@ -721,7 +721,7 @@ GROUP BY days_for_shipping_real, days_for_shipment_scheduled, benefit_per_order,
 HAVING COUNT(*) > 1;
 ```
 #### Output
-![Duplicate check](assets/images/duplicates check result.png)
+![Duplicate check](assets/images/duplicates%20check%20result.png)
 
 
 ## Exploratory data Analysis in PostgreSQL
@@ -755,13 +755,13 @@ select distinct delivery_status from shipping_details;
 
 -- 1. Distinct Customer Countries
 
-![All the Customer Countries](assets/images/customer countries output.png)
+![All the Customer Countries](assets/images/customer%20countries%20output.png)
 
  -- 2. Distinct Categories
 
-![All Categories](assets/images/distinct categories output .png)
-![All Categories](assets/images/distinct category output 2.png)
-![All Categories](assets/images/distinct categories output 3.png)
+![All Categories](assets/images/distinct%20categories%20output .png)
+![All Categories](assets/images/distinct%20category%20output%202.png)
+![All Categories](assets/images/distinct%20categories%20output%203.png)
 
 -- 3. Distinct Departments
 
@@ -772,12 +772,12 @@ select distinct delivery_status from shipping_details;
 
 -- 5. Distinct Shipping Modes
 
-![All the Shipping Modes](assets/images/distinct shipping mode output.png)
+![All the Shipping Modes](assets/images/distinct%20shipping%20mode%20output.png)
 
 
 -- 6. Distinct Delivery Status
 
-![All the Delivery status](assets/images/distinct delivery status output.png)
+![All the Delivery status](assets/images/distinct%20delivery%20status%20output.png)
 
 
 ### Date Exploration
@@ -794,7 +794,7 @@ FROM orders;
 ```
 
 #### Output
-![Number of Years of Sales](assets/images/Date Exploration output.png)
+![Number of Years of Sales](assets/images/Date%20Exploration%20output.png)
 
 
 ### Measures Exploration (KPI)
@@ -850,7 +850,7 @@ select 'Total Nr. Order Countries' as measure_name, count (distinct order_countr
 ```
 
 #### Output
-![Measures Exploration](assets/images/KPI output.png)
+![Measures Exploration](assets/images/KPI%20output.png)
 
 
 ### Magnitude Analysis
@@ -931,27 +931,27 @@ ORDER BY total_revenue DESC;
 
 -- 1. Total Customers by Countries
 
-![Total Customers by Countries](assets/images/magnitude total customers.png)
+![Total Customers by Countries](assets/images/magnitude%20total%20customers.png)
 
 -- 2. Total Products by Categories
 
-![Total Products by Categories](assets/images/magnitude category count 1.png)
-![Total Products by Categories](assets/images/magnitude category count 2.png)
-![Total Products by Categories](assets/images/magnitude category count 3.png)
+![Total Products by Categories](assets/images/magnitude%20category%20count%201.png)
+![Total Products by Categories](assets/images/magnitude%20category%20count%202.png)
+![Total Products by Categories](assets/images/magnitude%20category%20count%203.png)
 
 
 -- 3. Average Cost in Each Category
 
-![Average Cost in Each Category](assets/images/avg price category 1.png)
-![Average Cost in Each Category](assets/images/avg price category 2.png)
-![Average Cost in Each Category](assets/images/avg price category 3.png)
+![Average Cost in Each Category](assets/images/avg%20price%20category%201.png)
+![Average Cost in Each Category](assets/images/avg%20price%20category%202.png)
+![Average Cost in Each Category](assets/images/avg%20price%20category%203.png)
 
 
 -- 4. Total Revenue generated for each Category
 
-![Total Revenue generated for each Category](assets/images/total revenue category 1.png)
-![Total Revenue generated for each Category](assets/images/total revenue category 2.png)
-![Total Revenue generated for each Category](assets/images/total revenue category 3.png)
+![Total Revenue generated for each Category](assets/images/total%20revenue%20category%201.png)
+![Total Revenue generated for each Category](assets/images/total%20revenue%20category%202.png)
+![Total Revenue generated for each Category](assets/images/total%20revenue%20category%203.png)
 
 
 -- 5. Distribution of Sold Items across Countries (High cardinality dimension)
@@ -959,8 +959,8 @@ ORDER BY total_revenue DESC;
 
 -- 6. On-Time vs. Late Deliveries by Region
 
-![On-Time vs. Late Deliveries by Region](assets/images/magnitude late delivery output 1.png)
-![On-Time vs. Late Deliveries by Region](assets/images/magnitude late delivery output 2.png)
+![On-Time vs. Late Deliveries by Region](assets/images/magnitude%20late%20delivery%20output%201.png)
+![On-Time vs. Late Deliveries by Region](assets/images/magnitude%20late%20delivery%20output%202.png)
 
 
 -- 7. Sales by Market and Customer Segment
@@ -1077,32 +1077,32 @@ LIMIT 10;
 
 -- 1. Top Customers by Total Sales
 
-![Top Customers by Total Sales](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/ranking%20total%20spent%20by%20customers%20output.png)
+![Top Customers by Total Sales](assets/images/ranking%20total%20spent%20by%20customers%20output.png)
 
 
 -- 2. Top Customers by Total Profit
-![Top Customers by Total Profit](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/ranking%20total%20profit%20by%20top%2010%20customers.png)
+![Top Customers by Total Profit](assets/images/ranking%20total%20profit%20by%20top%2010%20customers.png)
 
 
 -- 3. Best Selling Products by Quantity Sold
-![Best Selling Products by Quantity Sold](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/ranking%20best%20selling%20products.png)
+![Best Selling Products by Quantity Sold](assets/images/ranking%20best%20selling%20products.png)
 
 
 -- 4. Worse Selling Products by Quantity Sold
-![Worse Selling Products by Quantity Sold](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/ranking%20worse%20selling%20products.png)
+![Worse Selling Products by Quantity Sold](assets/images/ranking%20worse%20selling%20products.png)
 
 
 -- 5. Most Profitable Products
-![Most Profitable Products](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/ranking%20profitable%20product.png)
+![Most Profitable Products](assets/images/ranking%20profitable%20product.png)
 
 -- 6. Less Profitable Products 
-![Less Profitable Products](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/Ranking%20less%20profitable%20products.png)
+![Less Profitable Products](assets/images/Ranking%20less%20profitable%20products.png)
 
 
 
 ## Visualization
 
-![Supply Chain Dashboard](https://github.com/opoku370/opoku370.github.io/blob/main/assets/images/Supply%20Chain%20Dashboard.gif)
+![Supply Chain Dashboard](assets/images/Supply%20Chain%20Dashboard.gif)
 
 
 ## Analysis
