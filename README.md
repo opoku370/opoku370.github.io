@@ -760,7 +760,7 @@ select distinct delivery_status from shipping_details;
 
  -- 2. Distinct Categories
 
-![All Categories](assets/images/distinct%20categories%20output .png)
+![All Categories](assets/images/distinct%20categories%20output%20.png)
 ![All Categories](assets/images/distinct%20category%20output%202.png)
 ![All Categories](assets/images/distinct%20categories%20output%203.png)
 
