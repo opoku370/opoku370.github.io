@@ -189,7 +189,7 @@ The general approach in creating this solution from start to finish;
  product_category_id integer, 	product_name character varying(255),
  product_price  double precision, 	shipping_date_dateorder	date, 
  shipping_mode character varying(255)
-)
+);
 
 COPY supply_chain from 'C:\temp\supply_chain.csv' delimiter ',' csv header;
 
