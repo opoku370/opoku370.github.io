@@ -35,9 +35,9 @@
 
 ## OBJECTIVE
 
-The Business Strategy Manager wants to gain deeper insights into customer purchasing patterns, product sales performance, and shipping efficiency to optimize business operations in the future years. The goal is to build a dashboard that provides key metrics on:
+The Business Strategy Manager wants to gain deeper insights into customer purchasing patterns, product sales performance, and shipping efficiency to optimize business operations in the future years. The goal is to use exploratory data analysis using postgreSQL and build a dashboard that provides key metrics on:
 - Customer behavior (purchasing trends, segmentation, and market distribution)
--	Product sales performance (best-selling products, discount impact, and profit margins)
+-	Product sales performance (best-selling products, worse selling products)
 -	Shipping efficiency (late delivery risk, delivery status, and shipping time analysis)
 This will help the business identify top-performing products, target high-value customers, and improve delivery efficiency, ensuring data-driven decisions that enhance overall profitability and customer satisfaction.
 
